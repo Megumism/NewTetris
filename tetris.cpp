@@ -7,7 +7,7 @@ using namespace std;
 char mapCache[401] = { ' ' };
 int map[240];
 int cube, pos, core, point=0;//方块种类,方块姿态,方块旋转核心,总分
-char op = NULL;//玩家操作
+char op = '0';//玩家操作
 bool opLegal;
 bool settled = true; //是否落下
 
@@ -99,7 +99,7 @@ void cubeRotate() {
 }
 //方块旋转
 void cubeMove(){
-	op = NULL;//清除操作缓存
+	op = '0';//清除操作缓存
 	opLegal = true;//初始化用户输入合法性
 	if (_kbhit() && (op = _getch()))//判断是否输入
 		switch (op)
