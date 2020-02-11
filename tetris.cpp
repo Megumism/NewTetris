@@ -1,60 +1,53 @@
 #include <iostream>
 #include <windows.h>
 #include <conio.h>
+#include <time.h>
 using namespace std;
+
+char mapCache[401] = { ' ' };
+int map[240];
+
+void mapPrint() {
+	for (int i = 40; i < 240; i++) {
+		if (map[i] == -1) {
+			mapCache[(i - 40) * 2 + 1] = mapCache[(i - 40) * 2] = ' ';
+		}
+		if (map[i] == 0) {
+			mapCache[(i - 40) * 2 + 1] = mapCache[(i - 40) * 2] = '0';
+		}
+		if (map[i] == 1) {
+			mapCache[(i - 40) * 2 + 1] = mapCache[(i - 40) * 2] = '1';
+		}
+	}
+	system("cls");
+	printf(mapCache);
+}
 
 int main()
 {
-    system("mode con:cols=10 lines=20"); //è®¾ç½®æ§åˆ¶å°å¤§å°
-    srand((unsigned)malloc(1));          //åˆå§‹åŒ–éšæœºç§å­
-    int map[10][24] = {-1};
-    char mapCache[201] = {' '};
-    bool settled = true; //æ˜¯å¦è½ä¸‹
-    int cube = rand() % 7;//æ–¹å—ç§ç±»
-    int pos = rand() % 4;//æ–¹å—å§¿æ€
+	system("mode con:cols=20 lines=20"); //ÉèÖÃ¿ØÖÆÌ¨´óĞ¡
+	srand(time(NULL));          //³õÊ¼»¯Ëæ»úÖÖ×Ó
 
-    do{
-        //æ–¹å—å†™å…¥
-        if (settled){
-            switch (cube){
-            case 0: //I
-                for (int i = 0; i < 4; i++)
-                {
-                    map[5][i] = 1;
-                }
-                break;
-                // case 1: //L
-                // case 2: //J
-                // case 3: //O
-                // case 4: //T
-                // case 5: //S
-                // case 6: //Z
-                // default:
-                //     break;
-            }
-            settled=false;
-        }
-        
-        //ä¸‹è½åˆæ³•æ€§æ£€æŸ¥
-        for (int i = 0; i < 9; i++){
-            for(int j=23;j>3;j--){
-                if(map[i][j]==1&&map[i][j-1]==0||map[i][23]==0){
-                    settled=true; 
-                }
-            }
+	char op;//Íæ¼Ò²Ù×÷
+	bool settled = true; //ÊÇ·ñÂäÏÂ
+	bool game = true;
+	int cube = rand() % 7;//·½¿éÖÖÀà
+	int pos = rand() % 4;//·½¿é×ËÌ¬
 
-        }        
-        //ä¸‹è½    
-        if(!settled){
-            for(int i = 0; i < 9; i++){
-                for(int j=23;j>3;j--){
-                    if(map[i][j]==0){
-                        swap(map[i][j],map[i][j+1]);
-                    }
-                }
-            }
-        }
+	for (int i = 0; i < 240; i++) {
+		map[i] = -1;
+	}
+		map[52] = map[53] = map[54] = map[63] = 0;
 
-    } while (true) ;
-    return 0;
+	do {//ÏÂÂä
+		for (int i = 239; i >= 40; i--) {
+			if (map[i] == 0) {
+				swap(map[i], map[i + 10]);
+			}
+		}
+		//if (_kbhit() && (op = _getch()))//ÅĞ¶ÏÊÇ·ñÊäÈë
+		Sleep(1000);
+		mapPrint();
+	} while (game);
+	return 0;
 }
