@@ -6,11 +6,12 @@ using namespace std;
 
 char mapCache[401] = { ' ' };
 int map[240];
-int cube, pos, core, point=0;//方块种类,方块姿态,方块旋转核心,总分
+int cube=1, pos, core, point = 0;//方块种类,方块姿态,方块旋转核心,总分
 char op = '0';//玩家操作
 bool opLegal;
 bool settled = true; //是否落下
 
+//打印地图
 void mapPrint() {
 	for (int i = 40; i < 240; i++) {
 		if (map[i] == -1) {
@@ -27,7 +28,31 @@ void mapPrint() {
 	printf(mapCache);
 	printf("point=%d", point);
 }
-//打印地图
+
+//方块旋转
+void cubeRotate() {
+	if (cube != 0 && cube != 1 && core % 10 != 0 && core % 10 != 9) 
+	{
+		map[core] = map[core - 11];//四角
+		map[core - 11] = map[core + 9];
+		map[core + 9] = map[core + 11];
+		map[core + 11] = map[core - 9];
+		map[core - 9] = map[core];
+		map[core] = map[core - 10];//四边
+		map[core - 10] = map[core - 1];
+		map[core - 1] = map[core + 10];
+		map[core + 10] = map[core + 1];
+		map[core + 1] = map[core];
+		map[core] = 0;
+	}
+	if (cube == 1 && ((core % 10 >= 1 && core % 10 <= 7 & map[core - 1] == -1 && map[core + 1] == -1 && map[core + 2] == -1) || (core / 10 <= 22 && map[core + 10] == -1 && map[core - 10] == -1 && map[core - 20] == -1))) {
+		swap(map[core + 1], map[core - 10]);
+		swap(map[core - 1], map[core + 10]);
+		swap(map[core - 20], map[core + 2]);
+	}
+}
+
+//生成方块
 void cubeProduce() {
 	if (settled) {
 		cube = rand() % 7;
@@ -35,10 +60,10 @@ void cubeProduce() {
 		switch (cube)
 		{
 		case 0://O
-			map[24] = map[25] = map[34] = map[35] = 0; core = 0;
+			map[24] = map[25] = map[34] = map[35] = 0; core = 24;
 			break;
 		case 1://I
-			map[4] = map[14] = map[24] = map[34] = 0; core = 0;
+			map[4] = map[14] = map[24] = map[34] = 0; core = 24;
 			break;
 		case 2://T
 			map[24] = map[33] = map[34] = map[35] = 0; core = 34;
@@ -56,10 +81,14 @@ void cubeProduce() {
 			map[23] = map[24] = map[34] = map[35] = 0; core = 24;
 			break;
 		}
+		for (int i = pos; i > 0; i--) {
+			cubeRotate();
+		}
 		settled = false;
 	}
 }
-//生成方块
+
+//方块下落
 void cubeFall() {
 	//下落合法性判断
 	if (!settled)
@@ -81,24 +110,9 @@ void cubeFall() {
 		}
 	}
 }
-//方块下落
-void cubeRotate() {
-	if (core) {
-		map[core] = map[core - 11];//四角
-		map[core - 11] = map[core + 9];
-		map[core + 9] = map[core + 11];
-		map[core + 11] = map[core - 9];
-		map[core - 9] = map[core];
-		map[core] = map[core - 10];//四边
-		map[core - 10] = map[core - 1];
-		map[core - 1] = map[core + 10];
-		map[core + 10] = map[core + 1];
-		map[core + 1] = map[core];
-		map[core] = 0;
-	}
-}
-//方块旋转
-void cubeMove(){
+
+//方块运动
+void cubeMove() {
 	op = '0';//清除操作缓存
 	opLegal = true;//初始化用户输入合法性
 	if (_kbhit() && (op = _getch()))//判断是否输入
@@ -134,7 +148,8 @@ void cubeMove(){
 			break;
 		}
 }
-//方块运动
+
+//方块消除
 void cubeErase() {
 	for (int i = 23; i >= 4 && settled; i--) {
 		bool cutoff = true;
@@ -153,7 +168,6 @@ void cubeErase() {
 		}
 	}
 }
-//方块消除
 
 int main()
 {
@@ -176,9 +190,10 @@ int main()
 		for (int i = 30; i < 40; i++) {
 			if (map[i] == 1) gaming = false;
 		}
-		
+
 		Sleep(300);
 		mapPrint();
 	} while (gaming);
+	printf(">>>>>GAME  OVER<<<<<\nYOUR POINT:%d", point);
 	return 0;
 }
