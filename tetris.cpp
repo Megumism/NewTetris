@@ -29,7 +29,7 @@ int main()
 	srand(time(NULL));          //初始化随机种子
 
 	char op;//玩家操作
-	bool settled = true; //是否落下
+	bool settled = false; //是否落下
 	bool game = true;
 	int cube = rand() % 7;//方块种类
 	int pos = rand() % 4;//方块姿态
@@ -39,14 +39,29 @@ int main()
 	}
 		map[52] = map[53] = map[54] = map[63] = 0;
 
-	do {//下落
-		for (int i = 239; i >= 40; i--) {
+	do {
+		//下落合法性判断
+		if (!settled)
+			for (int i = 239; i > 229; i--) {
+				if (map[i] == 0) settled = true;
+			}
+		if(!settled)
+			for (int i = 229; i >= 0; i--) {
+				if (map[i] == 0 && map[i + 10] == 1) settled = true;
+			}
+		if (settled) {//若落地固化！
+			for (int i = 0; i < 240; i++) {
+				if (map[i] == 0) map[i] = 1;
+			}
+		}
+		//下落
+		for (int i = 229; i >= 40; i--) {
 			if (map[i] == 0) {
 				swap(map[i], map[i + 10]);
 			}
 		}
 		//if (_kbhit() && (op = _getch()))//判断是否输入
-		Sleep(1000);
+		Sleep(300);
 		mapPrint();
 	} while (game);
 	return 0;
