@@ -28,7 +28,7 @@ int main()
 	system("mode con:cols=20 lines=20"); //设置控制台大小
 	srand(time(NULL));          //初始化随机种子
 
-	char op;//玩家操作
+	char op = NULL;//玩家操作
 	bool opLegal;
 	bool settled = true; //是否落下
 	bool game = true;
@@ -38,34 +38,15 @@ int main()
 	for (int i = 0; i < 240; i++) {
 		map[i] = -1;
 	}
-		map[234] = map[224] = map[214] = 1;
+		//map[234] = map[224] = map[214] = 1;
 
 	do {
 		if (settled) {
-			map[52] = map[53] = map[54] = map[63] = 0;
+			map[32] = map[33] = map[23] = map[13] =map[3] =map[2] = 0;
 			settled = false;
 		}
 
-		//下落合法性判断
-		if (!settled)
-			for (int i = 239; i >= 0 && !settled; i--) {
-				if (map[i] == 0&&i>=230) settled = true;
-				else if (map[i] == 0 && map[i + 10] == 1) settled = true;
-			}
-		if (settled) {//若落地则固化！
-			for (int i = 0; i < 240; i++) {
-				if (map[i] == 0) map[i] = 1;
-			}
-		}
-		//下落
-		for (int i = 229; i >= 40; i--) {
-			if (map[i] == 0) {
-				swap(map[i], map[i + 10]);
-			}
-		}
-
-		opLegal = true;
-
+		opLegal = true;//初始化用户输入
 		if (_kbhit() && (op = _getch()))//判断是否输入
 			switch (op)
 			{
@@ -87,7 +68,50 @@ int main()
 					if (map[i] == 0) swap(map[i], map[i + 1]);
 				}
 				break;
+			case's': case 'S':
+				break;
 			}
+
+		do {//下落合法性判断
+			if (!settled)
+				for (int i = 239; i >= 0 && !settled; i--) {
+					if (map[i] == 0&&i>=230) settled = true;
+					else if (map[i] == 0 && map[i + 10] == 1) settled = true;
+				}
+			//若落地则固化！
+			if (settled) {
+				for (int i = 0; i < 240; i++) {
+					if (map[i] == 0) map[i] = 1;
+				}
+			}		
+			//下落
+			for (int i = 229; i >= 0; i--) {
+				if (map[i] == 0) {
+					swap(map[i], map[i + 10]);
+				}
+			}
+		} while (!settled && (op == 's' || op == 'S'));
+
+		op = NULL;//清除操作缓存
+
+		//消除
+		for (int i = 23; i >= 4 && settled; i--) {
+			bool cutoff=true;
+			for (int j = 0; j < 10; j++) {
+				if (map[i * 10 + j] == -1) cutoff = false;
+			}				
+			if (cutoff) {
+				for (int j = 0; j < 10; j++) {
+					map[i * 10 + j] = -1;//消除一层
+				}
+				for (int ix = i * 10 + 9; ix >= 50; ix--) {//消除后落下
+					swap(map[ix], map[ix - 10]);
+				}
+				i++;
+			}
+		}
+		
+
 		Sleep(300);
 		mapPrint();
 	} while (game);
