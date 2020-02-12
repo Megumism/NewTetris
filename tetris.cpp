@@ -51,17 +51,62 @@ void mapPrint() {
 void cubeRotate() {
 	if (cube != 0 && cube != 1 && core % 10 != 0 && core % 10 != 9) 
 	{
-		map[core] = map[core - 11];//四角
-		map[core - 11] = map[core + 9];
-		map[core + 9] = map[core + 11];
-		map[core + 11] = map[core - 9];
-		map[core - 9] = map[core];
-		map[core] = map[core - 10];//四边
-		map[core - 10] = map[core - 1];
-		map[core - 1] = map[core + 10];
-		map[core + 10] = map[core + 1];
-		map[core + 1] = map[core];
-		map[core] = 0;
+		bool rotatable =true;
+		int corRot[5],lineRot[5];//其中5用于暂存别忘了
+		//读取地图	
+		{
+			corRot[0] = map[core - 11];
+			corRot[1] = map[core - 9];
+			corRot[2] = map[core + 11];
+			corRot[3] = map[core + 9];
+			lineRot[0] = map[core - 10];
+			lineRot[1] = map[core + 1];
+			lineRot[2] = map[core + 10];
+			lineRot[3] = map[core - 1];
+		}
+		//合法性审查
+		for (int i = 1; i <= 4 && rotatable; i++) {
+			if (corRot[i % 4] == 0 && corRot[(i + 1) % 4] > 0) rotatable = false;
+			if (lineRot[i % 4] == 0 && lineRot[(i + 1) % 4] > 0) rotatable = false;
+		}
+		if (rotatable) {
+			//角
+			int i = 4, j = 3;//定义两个指针
+			while (corRot[i % 4] > 0) i--;
+			corRot[4] = corRot[i];
+			while (j>=0)
+			{
+				while (corRot[i%4] > 0) i--;
+				while (j >= i || corRot[j%4] > 0) j--;
+				corRot[i] = corRot[j];
+				i--; j--;
+			}
+			corRot[0] = corRot[4];
+			//边
+			i = 4, j = 3;//定义两个指针
+			while (lineRot[i % 4] > 0) i--;
+			lineRot[4] = lineRot[i];
+			while (j >= 0)
+			{
+				while (lineRot[i % 4] > 0) i--;
+				while (j >= i || lineRot[j % 4] > 0) j--;
+				lineRot[i] = lineRot[j];
+				i--; j--;
+			}
+			lineRot[0] = lineRot[4];
+		}
+		//写入地图
+		{
+			map[core - 11] = corRot[0];
+			map[core - 9] = corRot[1];
+			map[core + 11] = corRot[2];
+			map[core + 9] = corRot[3];
+			map[core - 10] = lineRot[0];
+			map[core + 1] = lineRot[1];
+			map[core + 10] = lineRot[2];
+			map[core - 1] = lineRot[3];
+		}
+
 	}
 	if (cube == 1 && ((core % 10 >= 1 && core % 10 <= 7 && map[core - 1] == -1 && map[core + 1] == -1 && map[core + 2] == -1) || (core / 10 <= 22 && map[core + 10] == -1 && map[core - 10] == -1 && map[core - 20] == -1))) {
 		//判断横竖有没有位置以及能不能转
@@ -196,7 +241,7 @@ void cubeMove() {
 
 //方块消除
 void cubeErase() {
-		int bonus = 0;
+		int linebonus = 0,blockbonus = 0;
 	for (int i = 23; i >= 4 && settled; i--) {
 		bool cutoff = true;
 		for (int j = 0; j < 10; j++) {
@@ -205,7 +250,7 @@ void cubeErase() {
 		if (cutoff) {
 			for (int j = 0; j < 10; j++) {
 				if (map[i * 10 + j] > 13) {
-					bonus++;//消除老方块奖励
+					blockbonus++;//消除老方块奖励
 					map[i * 10 + j] -= 12; //削弱一层
 					mapPrint();
 					Sleep(50);
@@ -232,8 +277,10 @@ void cubeErase() {
 					}
 				}//消除后落下
 			}
-			bonus += 10;
-			point += bonus;
+			linebonus += 10;
+			point += linebonus;
+			point += blockbonus;
+			blockbonus = 0;
 			i++;//重新扫描
 		}
 	}
