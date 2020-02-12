@@ -1,4 +1,4 @@
-# 新·俄罗斯方块 (NewTetris)
+# 迷·俄罗斯方块 (NewTetris)
 
 实现了控制台俄罗斯方块，可执行文件是NewTetris。
 
