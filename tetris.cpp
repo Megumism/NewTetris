@@ -205,7 +205,10 @@ void cubeErase() {
 		if (cutoff) {
 			for (int j = 0; j < 10; j++) {
 				if (map[i * 10 + j] > 13) {
+					bonus++;//消除老方块奖励
 					map[i * 10 + j] -= 12; //削弱一层
+					mapPrint();
+					Sleep(50);
 					bool fallen;
 					do
 					{
@@ -218,16 +221,18 @@ void cubeErase() {
 								}
 							}
 						}
-					} while (!fallen);//集体塌陷
+					} while (!fallen);//老方块上方集体塌陷
 				}
 				else {
 					map[i * 10 + j] = -1;
+					mapPrint();
+					Sleep(50);
 					for (int ix = i; ix >= 4; ix--) {
 						swap(map[ix * 10 + j], map[(ix - 1) * 10 + j]);
 					}
 				}//消除后落下
 			}
-			bonus++;
+			bonus += 10;
 			point += bonus;
 			i++;//重新扫描
 		}
