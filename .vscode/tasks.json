@@ -5,7 +5,7 @@
       "label": "build",
       "type": "shell",
       "command": "g++",
-      "args": ["-g", "-o", "tetris", "tetris.cpp"],
+      "args": ["-g", "-o", "tetris", "Newtetris.cpp"],
       "group": {
         "kind": "build",
         "isDefault": true
